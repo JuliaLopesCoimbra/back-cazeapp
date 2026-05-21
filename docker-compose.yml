@@ -1,0 +1,171 @@
+services:
+
+  # ─── Load Balancer ────────────────────────────────────────────────────────
+  traefik:
+    image: traefik:v3.0
+    container_name: traefik
+    restart: always
+    command:
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:3333"
+      # Dashboard na porta 8080 — acesse http://servidor:8080/dashboard/
+      # Remover as duas linhas abaixo em produção
+      - "--api.insecure=true"
+      - "--api.dashboard=true"
+    ports:
+      - "3333:3333"   # porta da API (igual à atual)
+      - "8080:8080"   # dashboard Traefik
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+
+  # ─── API (múltiplas réplicas) ──────────────────────────────────────────────
+  api:
+    build: .
+    restart: always
+    # Porta interna 8000 — Traefik faz o roteamento externo 3333 → 8000
+    # staging: 2 workers (economiza RAM). Produção: aumentar para 4+
+    command: gunicorn app.main:app --workers 2 --worker-class uvicorn.workers.UvicornWorker --bind 0.0.0.0:8000 --timeout 120 --access-logfile - --error-logfile -
+    env_file:
+      - .env
+    deploy:
+      replicas: 1   # staging: 1 réplica (máquina com 2GB). Produção: aumentar para 3+
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.api.rule=PathPrefix(`/`)"
+      - "traefik.http.routers.api.entrypoints=web"
+      - "traefik.http.services.api.loadbalancer.server.port=8000"
+      - "traefik.http.services.api.loadbalancer.healthcheck.path=/health"
+      - "traefik.http.services.api.loadbalancer.healthcheck.interval=30s"
+      - "traefik.http.services.api.loadbalancer.healthcheck.timeout=5s"
+    depends_on:
+      redis:
+        condition: service_healthy
+      pgbouncer:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8000/health')\" || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 45s
+
+  # ─── Roulette ─────────────────────────────────────────────────────────────
+  roulette:
+    build: ./services/roulette
+    restart: always
+    command: gunicorn app.main:app --workers 2 --worker-class uvicorn.workers.UvicornWorker --bind 0.0.0.0:8002 --timeout 120 --access-logfile - --error-logfile -
+    env_file:
+      - .env
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.roulette.rule=PathPrefix(`/roulette`)"
+      - "traefik.http.routers.roulette.entrypoints=web"
+      - "traefik.http.services.roulette.loadbalancer.server.port=8002"
+    depends_on:
+      redis:
+        condition: service_healthy
+      pgbouncer:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8002/health')\" || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 45s
+
+  # ─── Photo AI (reconhecimento facial) ────────────────────────────────────
+  photo-ai:
+    build: ./services/photo-ai
+    restart: always
+    command: gunicorn app.main:app --workers 2 --worker-class uvicorn.workers.UvicornWorker --bind 0.0.0.0:8001 --timeout 120 --access-logfile - --error-logfile -
+    env_file:
+      - .env
+    volumes:
+      - /home/ec2-user/back-n1/private_key.pem:/app/private_key.pem:ro
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.photo-ai.rule=PathPrefix(`/photo-ai`)"
+      - "traefik.http.routers.photo-ai.entrypoints=web"
+      - "traefik.http.services.photo-ai.loadbalancer.server.port=8001"
+    depends_on:
+      redis:
+        condition: service_healthy
+      pgbouncer:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8001/health')\" || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 45s
+
+  # ─── Celery: worker de notificações ───────────────────────────────────────
+  worker-notifications:
+    build: .
+    restart: always
+    command: celery -A app.infra.celery_app worker -Q notifications --pool=prefork --concurrency=4 --loglevel=info -n worker-notifications@%h
+    env_file:
+      - .env
+    depends_on:
+      redis:
+        condition: service_healthy
+
+  # ─── Celery: worker de anúncios ────────────────────────────────────────────
+  worker-ads:
+    build: .
+    restart: always
+    command: celery -A app.infra.celery_app worker -Q ads --pool=prefork --concurrency=2 --loglevel=info -n worker-ads@%h
+    env_file:
+      - .env
+    depends_on:
+      redis:
+        condition: service_healthy
+
+  # ─── Celery: worker padrão (analytics, photo_ai matching) ──────────────────
+  worker-default:
+    build: .
+    restart: always
+    command: celery -A app.infra.celery_app worker -Q celery --pool=prefork --concurrency=2 --loglevel=info -n worker-default@%h
+    env_file:
+      - .env
+    depends_on:
+      redis:
+        condition: service_healthy
+      pgbouncer:
+        condition: service_healthy
+
+  # ─── Redis (com persistência) ─────────────────────────────────────────────
+  redis:
+    image: redis:alpine
+    container_name: redis-server
+    restart: always
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes --appendfsync everysec
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ─── PgBouncer (proxy de conexões para os 5 bancos) ───────────────────────
+  pgbouncer:
+    build: ./pgbouncer
+    container_name: pgbouncer
+    restart: always
+    env_file:
+      - .env
+    expose:
+      - "6432"
+    healthcheck:
+      test: ["CMD-SHELL", "nc -z 127.0.0.1 6432 || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+volumes:
+  redis_data:

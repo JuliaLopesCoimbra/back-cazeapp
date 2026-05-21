@@ -1,0 +1,47 @@
+[databases]
+; Cada linha mapeia um nome de banco (que a app usa) para o banco real
+auth_db         = host=${AUTH_DB_HOST}         port=${AUTH_DB_PORT}         dbname=${AUTH_DB_NAME}         user=${AUTH_DB_USER}         password=${AUTH_DB_PASS}
+admin_db        = host=${ADMIN_DB_HOST}        port=${ADMIN_DB_PORT}        dbname=${ADMIN_DB_NAME}        user=${ADMIN_DB_USER}        password=${ADMIN_DB_PASS}
+interaction_db  = host=${INTERACTION_DB_HOST}  port=${INTERACTION_DB_PORT}  dbname=${INTERACTION_DB_NAME}  user=${INTERACTION_DB_USER}  password=${INTERACTION_DB_PASS}
+roulette_db     = host=${ROULETTE_DB_HOST}     port=${ROULETTE_DB_PORT}     dbname=${ROULETTE_DB_NAME}     user=${ROULETTE_DB_USER}     password=${ROULETTE_DB_PASS}
+notification_db = host=${NOTIFICATION_DB_HOST} port=${NOTIFICATION_DB_PORT} dbname=${NOTIFICATION_DB_NAME} user=${NOTIFICATION_DB_USER} password=${NOTIFICATION_DB_PASS}
+
+[pgbouncer]
+listen_addr = 0.0.0.0
+listen_port = 6432
+
+; transaction mode: a conexão real é liberada entre transações → ideal para FastAPI/SQLAlchemy
+; session mode: mais simples, mas mantém a conexão presa por toda a sessão SQLAlchemy
+pool_mode = transaction
+
+; Máximo de clientes simultâneos (app containers + workers)
+max_client_conn = 500
+
+; Conexões reais mantidas por banco no pool do PgBouncer
+default_pool_size = 15
+min_pool_size = 2
+reserve_pool_size = 5
+reserve_pool_timeout = 3.0
+
+; auth_type = any: aceita qualquer cliente na rede Docker interna sem verificar senha.
+; Seguro porque a porta 6432 não está exposta externamente.
+; O PgBouncer ainda usa as credenciais corretas de cada banco ao conectar no servidor real.
+auth_type = any
+
+; SSL entre PgBouncer e os bancos reais (eles exigem SSL)
+server_tls_sslmode = require
+
+; Sem SSL entre a app e o PgBouncer (rede Docker interna)
+client_tls_sslmode = disable
+
+; Logs — 0 = desabilitado para não poluir (ative em debug)
+log_connections = 0
+log_disconnections = 0
+log_pooler_errors = 1
+
+; Health check periódico nas conexões reais
+server_check_delay = 30
+server_check_query = SELECT 1
+
+; Timeout para conexões ociosas com o servidor
+server_idle_timeout = 600

@@ -1,0 +1,16 @@
+fastapi
+uvicorn[standard]
+gunicorn
+SQLAlchemy
+psycopg2-binary
+PyJWT
+python-multipart
+pytz
+pydantic
+pydantic-settings
+python-dotenv
+redis
+boto3
+httpx
+Pillow
+cryptography

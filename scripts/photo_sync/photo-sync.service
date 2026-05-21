@@ -1,0 +1,19 @@
+[Unit]
+Description=Photo Sync — Drive → S3 → Rekognition
+After=network.target
+
+[Service]
+Type=simple
+User=ec2-user
+WorkingDirectory=/home/ec2-user/back-n1/scripts/photo_sync
+EnvironmentFile=/etc/photo-sync/.env
+ExecStart=/usr/bin/python3 /home/ec2-user/back-n1/scripts/photo_sync/sync.py \
+    --event-id ${EVENT_ID} \
+    --drive-folder-id ${DRIVE_FOLDER_ID}
+Restart=always
+RestartSec=15
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target
