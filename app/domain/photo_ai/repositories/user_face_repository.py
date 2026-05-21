@@ -1,10 +1,11 @@
+from typing import Optional, List
 from sqlalchemy.orm import Session
 from app.domain.photo_ai.models.user_face_model import UserFace
 
 
 class UserFaceRepository:
     @staticmethod
-    def get_by_user_event(db: Session, user_id: int, event_id: str) -> UserFace | None:
+    def get_by_user_event(db: Session, user_id: int, event_id: str) -> Optional[UserFace]:
         return db.query(UserFace).filter(
             UserFace.user_id == user_id,
             UserFace.event_id == event_id,
@@ -24,5 +25,5 @@ class UserFaceRepository:
         db.commit()
 
     @staticmethod
-    def list_by_event(db: Session, event_id: str) -> list[UserFace]:
+    def list_by_event(db: Session, event_id: str) -> List[UserFace]:
         return db.query(UserFace).filter(UserFace.event_id == event_id).all()

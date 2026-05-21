@@ -1,5 +1,6 @@
 import secrets
 from datetime import datetime
+from typing import Optional, List
 
 from sqlalchemy.orm import Session
 
@@ -49,7 +50,7 @@ class TshirtReservationService:
         return out
 
     @staticmethod
-    def get_mine(db: Session, user_id: int) -> TshirtReservation | None:
+    def get_mine(db: Session, user_id: int) -> Optional[TshirtReservation]:
         return TshirtReservationRepository.get_any_by_user_id(db, user_id)
 
     @staticmethod
