@@ -226,14 +226,30 @@ class RekognitionService:
                     continue
                 
                 try:
+                    import re
+                    ext = os.path.splitext(nome_arquivo)[1]
                     nome_limpo = os.path.splitext(nome_arquivo)[0]
-                    
+                    nome_limpo = re.sub(r'[^a-zA-Z0-9_.\-:]', '_', nome_limpo)
+
+                    # Se o nome foi sanitizado, copia o arquivo no S3 com o novo nome
+                    pasta = s3_key[: len(s3_key) - len(nome_arquivo)]
+                    s3_key_sanitizado = f"{pasta}{nome_limpo}{ext}"
+                    if s3_key_sanitizado != s3_key:
+                        try:
+                            self.s3.copy_object(
+                                Bucket=self.bucket_name,
+                                CopySource={'Bucket': self.bucket_name, 'Key': s3_key},
+                                Key=s3_key_sanitizado
+                            )
+                        except Exception:
+                            s3_key_sanitizado = s3_key
+
                     index_response = self.rekognition.index_faces(
                         CollectionId=collection_id,
                         Image={
                             'S3Object': {
                                 'Bucket': self.bucket_name,
-                                'Name': s3_key
+                                'Name': s3_key_sanitizado
                             }
                         },
                         ExternalImageId=nome_limpo,

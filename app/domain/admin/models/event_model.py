@@ -33,7 +33,7 @@ class Event(AdminBase):
     meeting_point_location = Column(String(255), nullable=True)  # Local do meeting point
     meeting_point_schedule = Column(JSON, nullable=True)  # Horários de funcionamento em formato JSON
     event_type = Column(String(50), nullable=False, default="carnival")  # Tipo do evento: carnival | world_cup
-    brand_key = Column(String(50), nullable=False, default="default")  # Identidade visual do evento: default | n1_torcida
+    brand_key = Column(String(50), nullable=False, default="default")  # Identidade visual do evento: default | n1_torcida | casa_cazetv
     ticket_url = Column(String(500), nullable=True)  # URL de compra de ingressos
 
     # Sistema de soft delete

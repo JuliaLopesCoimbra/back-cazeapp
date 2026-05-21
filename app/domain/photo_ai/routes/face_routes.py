@@ -41,7 +41,7 @@ async def search_face(
     file: UploadFile = File(...),
     threshold: float = Form(70.0),
     max_faces: int = Form(5),
-    collection_id: str = Form("meu_banco_de_rostos"),
+    collection_id: str = Form("caze-rostos"),
     event_id: Optional[int] = Form(None),
     current_user: User = Depends(get_current_user)
 ):
