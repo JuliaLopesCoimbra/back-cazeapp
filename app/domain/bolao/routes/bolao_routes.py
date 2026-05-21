@@ -1,4 +1,6 @@
-from fastapi import APIRouter, Depends
+import os
+from fastapi import APIRouter, Depends, HTTPException
+from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
 from app.config.roulette_db import get_roulette_db
@@ -87,3 +89,63 @@ def my_redemptions(
     current_user: User = Depends(get_current_user),
 ):
     return BolaoController.get_my_redemptions(db, current_user)
+
+
+# ── Dev/test only ──────────────────────────────────────────────────────────────
+
+def _guard_dev(current_user: User):
+    if os.getenv("ENV") == "production":
+        raise HTTPException(status_code=403, detail="Indisponível em produção")
+    if current_user.role not in ("admin_master", "subadmin"):
+        raise HTTPException(status_code=403, detail="Acesso negado")
+
+
+class SettleTestPayload(BaseModel):
+    fixture_id: int
+    actual_home: int
+    actual_away: int
+
+
+@router.post("/dev/settle", include_in_schema=False)
+def dev_settle_fixture(
+    data: SettleTestPayload,
+    db: Session = Depends(get_roulette_db),
+    current_user: User = Depends(get_current_user),
+):
+    _guard_dev(current_user)
+    from app.domain.bolao.services.bolao_service import settle_predictions
+    count = settle_predictions(db, data.fixture_id, data.actual_home, data.actual_away)
+    return {"settled": count, "fixture_id": data.fixture_id,
+            "result": f"{data.actual_home}x{data.actual_away}"}
+
+
+@router.post("/dev/reset/{fixture_id}", include_in_schema=False)
+def dev_reset_fixture(
+    fixture_id: int,
+    db: Session = Depends(get_roulette_db),
+    current_user: User = Depends(get_current_user),
+):
+    _guard_dev(current_user)
+    from app.domain.bolao.models.bolao_prediction_model import BolaoPredicition
+    from app.domain.bolao.repositories.bolao_repository import BolaoUserPointsRepository
+
+    settled = (
+        db.query(BolaoPredicition)
+        .filter(
+            BolaoPredicition.fixture_id == fixture_id,
+            BolaoPredicition.status != "pending",
+        )
+        .all()
+    )
+
+    for pred in settled:
+        if pred.points_earned > 0:
+            record = BolaoUserPointsRepository.get(db, pred.user_id)
+            if record:
+                record.total_points = max(0, record.total_points - pred.points_earned)
+        pred.status = "pending"
+        pred.points_earned = 0
+        pred.settled_at = None
+
+    db.commit()
+    return {"reset": len(settled), "fixture_id": fixture_id}
