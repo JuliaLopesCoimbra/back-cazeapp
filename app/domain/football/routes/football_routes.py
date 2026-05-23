@@ -104,11 +104,11 @@ def mock_live(
     mock = {
         "fixture": {
             "id": 855744,
-            "date": "2022-11-24T16:00:00+00:00",
+            "date": "2026-06-20T16:00:00+00:00",
             "status": {"long": "1º Tempo", "short": "1H", "elapsed": elapsed},
-            "venue": {"name": "Lusail Stadium", "city": "Lusail"},
+            "venue": {"name": "MetLife Stadium", "city": "Nova York"},
         },
-        "league": {"round": "Fase de Grupos", "season": 2022},
+        "league": {"round": "Fase de Grupos", "season": 2026},
         "teams": {
             "home": {
                 "id": 6,
@@ -117,9 +117,9 @@ def mock_live(
                 "winner": None,
             },
             "away": {
-                "id": 9,
-                "name": "Sérvia",
-                "logo": "https://media.api-sports.io/football/teams/9.png",
+                "id": 169,
+                "name": "Marrocos",
+                "logo": "https://media.api-sports.io/football/teams/169.png",
                 "winner": None,
             },
         },
@@ -134,7 +134,7 @@ def mock_live(
     redis_client.set(CacheKeys.football_brazil_live(), [mock], ttl=600)
     return {
         "ok": True,
-        "partida": f"Brasil {home_goals} x {away_goals} Sérvia",
+        "partida": f"Brasil {home_goals} x {away_goals} Marrocos",
         "minuto": elapsed,
         "dica": "Para remover, DELETE /football/debug/mock-live",
     }
