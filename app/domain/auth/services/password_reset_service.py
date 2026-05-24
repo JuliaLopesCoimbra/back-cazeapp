@@ -45,7 +45,7 @@ class PasswordResetService:
         email_log = EmailLogRepository.create_log(
             db=db,
             recipient_email=user.email,
-            subject="Recuperação de Senha - N1 App",
+            subject="Recuperação de Senha - CazéApp",
             email_type=EmailType.PASSWORD_RESET,
             user_id=user.id,
             status=EmailStatus.PENDING,
@@ -67,7 +67,7 @@ class PasswordResetService:
         # Enviar email com log
         send_result = EmailSender.send_email(
             user.email,
-            "Recuperação de Senha - N1 App",
+            "Recuperação de Senha - CazéApp",
             html,
             db_session=db,
             email_log_id=email_log.id

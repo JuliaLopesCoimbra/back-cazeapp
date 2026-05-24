@@ -80,7 +80,7 @@ class EmailVerificationService:
         email_log = EmailLogRepository.create_log(
             db=db,
             recipient_email=user.email,
-            subject="Confirme seu e-mail - N1 App",
+            subject="Confirme seu e-mail - CazéApp",
             email_type=EmailType.VERIFICATION,
             user_id=user.id,
             status=EmailStatus.PENDING,
@@ -102,7 +102,7 @@ class EmailVerificationService:
         # Enviar email com log
         send_result = EmailSender.send_email(
             user.email,
-            "Confirme seu e-mail - N1 App",
+            "Confirme seu e-mail - CazéApp",
             html,
             db_session=db,
             email_log_id=email_log.id
@@ -215,7 +215,7 @@ class EmailVerificationService:
         email_log = EmailLogRepository.create_log(
             db=db,
             recipient_email=user.email,
-            subject="Primeiro acesso ao sistema - N1 App",
+            subject="Primeiro acesso ao sistema - CazéApp",
             email_type=EmailType.FIRST_ACCESS,
             user_id=user.id,
             status=EmailStatus.PENDING,
@@ -237,7 +237,7 @@ class EmailVerificationService:
         # Enviar email com log
         send_result = EmailSender.send_email(
             user.email,
-            "Primeiro acesso ao sistema - N1 App",
+            "Primeiro acesso ao sistema - CazéApp",
             html,
             db_session=db,
             email_log_id=email_log.id

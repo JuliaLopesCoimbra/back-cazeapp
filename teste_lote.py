@@ -30,7 +30,7 @@ def enviar_teste():
             msg = MIMEMultipart()
             msg['From'] = MAIL_FROM
             msg['To'] = email
-            msg['Subject'] = "Teste Real N1 App - Verificacao"
+            msg['Subject'] = "Teste Real CazéApp - Verificacao"
             corpo = f"Teste de entrega para {email}\nEnvio realizado as {time.ctime()}"
             msg.attach(MIMEText(corpo, 'plain'))
             

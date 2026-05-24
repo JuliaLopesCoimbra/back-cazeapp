@@ -23,7 +23,7 @@ class EmailTemplates:
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>N1 App</title>
+    <title>CazéApp</title>
 </head>
 <body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #f3f4f6;">
     <table role="presentation" style="width: 100%; border-collapse: collapse; background-color: #f3f4f6; padding: 20px 0;">
@@ -33,7 +33,7 @@ class EmailTemplates:
                     <!-- Header com Logo -->
                     <tr>
                         <td style="background: linear-gradient(135deg, {primary_color} 0%, #4f46e5 100%); padding: 40px 30px; text-align: center;">
-                            <img src="{EmailTemplates.get_logo_url()}" alt="N1 App Logo" style="max-width: 150px; height: auto; display: block; margin: 0 auto;" />
+                            <img src="{EmailTemplates.get_logo_url()}" alt="CazéApp Logo" style="max-width: 150px; height: auto; display: block; margin: 0 auto;" />
                         </td>
                     </tr>
                     
@@ -48,7 +48,7 @@ class EmailTemplates:
                     <tr>
                         <td style="background-color: #f9fafb; padding: 30px; text-align: center; border-top: 1px solid #e5e7eb;">
                             <p style="margin: 0 0 10px 0; color: #6b7280; font-size: 14px; line-height: 1.5;">
-                                <strong style="color: #111827;">N1 App</strong>
+                                <strong style="color: #111827;">CazéApp</strong>
                             </p>
                             <p style="margin: 0; color: #9ca3af; font-size: 12px; line-height: 1.5;">
                                 Este é um email automático, por favor não responda.
@@ -79,7 +79,7 @@ class EmailTemplates:
             </p>
             
             <p style="margin: 0 0 30px 0; color: #4b5563; font-size: 16px; line-height: 1.6;">
-                Obrigado por se cadastrar no N1 App! Para completar seu cadastro e começar a usar nossa plataforma, 
+                Obrigado por se cadastrar no CazéApp! Para completar seu cadastro e começar a usar nossa plataforma, 
                 precisamos confirmar seu endereço de e-mail.
             </p>
             
@@ -124,7 +124,7 @@ class EmailTemplates:
             </p>
             
             <p style="margin: 0 0 30px 0; color: #4b5563; font-size: 16px; line-height: 1.6;">
-                Recebemos uma solicitação para redefinir a senha da sua conta no N1 App. 
+                Recebemos uma solicitação para redefinir a senha da sua conta no CazéApp. 
                 Clique no botão abaixo para criar uma nova senha.
             </p>
             
@@ -169,7 +169,7 @@ class EmailTemplates:
             </p>
             
             <p style="margin: 0 0 30px 0; color: #4b5563; font-size: 16px; line-height: 1.6;">
-                Você foi convidado como administrador do N1 App. Clique no botão abaixo para definir sua senha 
+                Você foi convidado como administrador do CazéApp. Clique no botão abaixo para definir sua senha 
                 e acessar o sistema.
             </p>
             
