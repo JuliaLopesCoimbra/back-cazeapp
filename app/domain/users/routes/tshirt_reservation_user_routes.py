@@ -1,3 +1,4 @@
+from typing import Optional
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
@@ -29,7 +30,7 @@ def user_tshirt_availability(
 
 @router.get(
     "/tshirt-reservation",
-    response_model=TshirtReservationUserResponseSchema | None,
+    response_model=Optional[TshirtReservationUserResponseSchema],
 )
 def user_get_tshirt_reservation(
     db: Session = Depends(get_admin_db),

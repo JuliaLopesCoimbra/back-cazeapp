@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import Optional
 from sqlalchemy.orm import Session
 from app.domain.admin.repositories.photo_sync_log_repository import PhotoSyncLogRepository
 from app.domain.admin.schemas.photo_sync_schema import (
@@ -38,7 +39,7 @@ class PhotoSyncService:
                 logging.getLogger(__name__).warning(f"Failed to queue face matching task: {e}")
 
     @staticmethod
-    def get_status(db: Session, event_id: str | None = None) -> PhotoSyncStatusSchema:
+    def get_status(db: Session, event_id: Optional[str] = None) -> PhotoSyncStatusSchema:
         last = PhotoSyncLogRepository.get_last(db, event_id)
         last_with_drive = PhotoSyncLogRepository.get_last_with_drive_count(db, event_id)
         recent = PhotoSyncLogRepository.list_recent(db, limit=20, event_id=event_id)

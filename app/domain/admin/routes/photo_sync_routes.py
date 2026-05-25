@@ -1,4 +1,5 @@
 import os
+from typing import Optional
 from fastapi import APIRouter, Depends, Header, HTTPException, Query
 from sqlalchemy.orm import Session
 
@@ -26,7 +27,7 @@ def photo_sync_heartbeat(
 
 @router.get("/photo-sync/status", response_model=PhotoSyncStatusSchema)
 def photo_sync_status(
-    event_id: str | None = Query(None),
+    event_id: Optional[str] = Query(None),
     db: Session = Depends(get_admin_db),
     _user=Depends(require_subadmin_or_master),
 ):

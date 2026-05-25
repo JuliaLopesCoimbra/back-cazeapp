@@ -1,4 +1,5 @@
 import copy
+from typing import Optional
 from fastapi import APIRouter, Depends, Query, HTTPException
 from app.core.security.auth_dependency import get_current_user
 from app.infra.redis import redis_client, CacheKeys
@@ -85,7 +86,7 @@ def mock_live(
     elapsed: int = Query(default=32, description="Minuto do jogo simulado"),
     home_goals: int = Query(default=1),
     away_goals: int = Query(default=0),
-    fixture_id: int | None = Query(default=None, description="ID real da API-Sports. Se informado, usa dados reais."),
+    fixture_id: Optional[int] = Query(default=None, description="ID real da API-Sports. Se informado, usa dados reais."),
     current_user=Depends(get_current_user),
 ):
     """Injeta um fixture ao vivo no cache Redis. Se fixture_id informado, busca dados reais da API-Sports."""
