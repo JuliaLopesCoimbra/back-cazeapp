@@ -16,9 +16,9 @@ jobs:
           host: ${{ secrets.PROD_BACKEND_HOST }}
           username: ${{ secrets.PROD_USER }}
           key: ${{ secrets.PROD_SSH_KEY }}
-          script_stop: true
           command_timeout: 10m
           script: |
+            set -e
             cd /home/ubuntu/back-bbb27
 
             # Atualiza o código
