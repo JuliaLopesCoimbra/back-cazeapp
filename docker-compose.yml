@@ -8,13 +8,13 @@ services:
     command:
       - "--providers.docker=true"
       - "--providers.docker.exposedbydefault=false"
-      - "--entrypoints.web.address=:3333"
+      - "--entrypoints.web.address=:8000"
       # Dashboard na porta 8080 — acesse http://servidor:8080/dashboard/
       # Remover as duas linhas abaixo em produção
       - "--api.insecure=true"
       - "--api.dashboard=true"
     ports:
-      - "3333:3333"   # porta da API (igual à atual)
+      - "8000:8000"   # porta da API
       - "8080:8080"   # dashboard Traefik
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
