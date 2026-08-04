@@ -1,0 +1,33 @@
+name: Deploy Production Backend
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy na AWS via Docker (Back)
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.PROD_BACKEND_HOST }}
+          username: ${{ secrets.PROD_USER }}
+          key: ${{ secrets.PROD_SSH_KEY }}
+          script_stop: true
+          command_timeout: 10m
+          script: |
+            cd /home/ubuntu/back-bbb27
+
+            # Atualiza o código
+            git fetch origin
+            git checkout main
+            git reset --hard origin/main
+
+            # Rebuild e sobe todos os serviços
+            docker compose up -d --build
+
+            # Smoke test
+            sleep 5
+            curl -fsS https://api-bbb27.picbrand.com.br/health
