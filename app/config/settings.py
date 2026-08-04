@@ -85,11 +85,6 @@ class Settings(BaseSettings):
     VAPID_PRIVATE_KEY: Optional[str] = None
     VAPID_PUBLIC_KEY: Optional[str] = None
 
-    # ===== API-SPORTS (football) =====
-    APISPORTS_KEY: Optional[str] = None
-    # Free plan: use 2022 or 2023. Paid plan: use 2026 (temporada real da Copa)
-    APISPORTS_WC_SEASON: int = 2022
-
     # ===== REDIS =====
     REDIS_HOST: str = "localhost"
     REDIS_PORT: int = 6379

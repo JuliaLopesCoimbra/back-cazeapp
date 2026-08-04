@@ -34,8 +34,6 @@ from app.domain.users.routes.downloaded_photo_routes import router as downloaded
 from app.domain.admin.routes.ad_click_routes import router as ad_click_router
 from app.domain.admin.routes.world_cup_game_routes import router as world_cup_game_router
 from app.domain.analytics.routes.analytics_routes import router as analytics_router
-from app.domain.football.routes.football_routes import router as football_router
-from app.domain.bolao.routes.bolao_routes import router as bolao_router
 
 # Importar modelos para garantir que SQLAlchemy os registre
 from app.domain.admin.models.ad_click_model import AdClick  # noqa: F401
@@ -57,10 +55,6 @@ from app.domain.admin.routes.tshirt_stock_routes import router as tshirt_stock_r
 from app.domain.admin.models.photo_sync_log_model import PhotoSyncLog  # noqa: F401
 from app.domain.admin.routes.photo_sync_routes import router as photo_sync_router
 from app.domain.photo_ai.models.user_face_model import UserFace  # noqa: F401
-from app.domain.bolao.models.bolao_prediction_model import BolaoPredicition  # noqa: F401
-from app.domain.bolao.models.bolao_prize_model import BolaoPrize  # noqa: F401
-from app.domain.bolao.models.bolao_redemption_model import BolaoRedemption  # noqa: F401
-from app.domain.bolao.models.bolao_user_points_model import BolaoUserPoints  # noqa: F401
 from app.domain.photo_ai.routes.face_routes import router as face_router
 from app.domain.users.models.user_photo_model import UserPhoto  # noqa: F401
 from app.config.admin_db import AdminSessionLocal
@@ -132,8 +126,6 @@ app.include_router(downloaded_photo_router)
 app.include_router(ad_click_router)
 app.include_router(world_cup_game_router)
 app.include_router(analytics_router)
-app.include_router(football_router)
-app.include_router(bolao_router)
 app.include_router(tshirt_stock_router)
 app.include_router(tshirt_reservation_admin_router)
 app.include_router(photo_sync_router)

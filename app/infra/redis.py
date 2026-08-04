@@ -204,22 +204,6 @@ class CacheKeys:
     def user_presence(user_id: int) -> str:
         return f"presence:{user_id}"
 
-    @staticmethod
-    def football_brazil_fixtures() -> str:
-        return "football:brazil:fixtures"
-
-    @staticmethod
-    def football_brazil_live() -> str:
-        return "football:brazil:live"
-
-    @staticmethod
-    def football_fixture_events(fixture_id: int) -> str:
-        return f"football:fixture:events:{fixture_id}"
-
-    @staticmethod
-    def football_standings() -> str:
-        return "football:standings"
-
 
 # ===== RATE LIMITING =====
 
