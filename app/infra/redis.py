@@ -228,7 +228,13 @@ def check_rate_limit(
     
     Raises:
         HTTPException: Se critical=True e Redis não está disponível (503 Service Unavailable)
+
+    Fora de produção (settings.ENV != "production"), `critical` nunca bloqueia com 503 —
+    só loga o aviso e libera a requisição. Evita depender de Redis para rodar localmente.
     """
+    if critical and settings.ENV != "production":
+        critical = False
+
     if not redis_client.is_connected():
         if critical:
             # Endpoints críticos: retornar erro 503 para forçar correção do Redis
