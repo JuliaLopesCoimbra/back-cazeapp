@@ -1,0 +1,39 @@
+# Fase 2: HTTPS (PICBRAND ARCH §10). Ativar SOMENTE após emissão validada:
+#   mv nginx/conf.d/02-https.conf.disabled nginx/conf.d/02-https.conf
+#   docker compose exec nginx nginx -t
+#   docker compose exec nginx nginx -s reload
+server {
+  listen 443 ssl;
+  http2 on;
+  server_name api-bbb27.picbrand.com.br;
+
+  ssl_certificate /etc/letsencrypt/live/api-bbb27.picbrand.com.br/fullchain.pem;
+  ssl_certificate_key /etc/letsencrypt/live/api-bbb27.picbrand.com.br/privkey.pem;
+  ssl_protocols TLSv1.2 TLSv1.3;
+  ssl_prefer_server_ciphers on;
+
+  add_header X-Content-Type-Options nosniff always;
+  add_header X-Frame-Options DENY always;
+  add_header Referrer-Policy strict-origin-when-cross-origin always;
+  # add_header Strict-Transport-Security "max-age=31536000" always;
+
+  client_max_body_size 20m;
+
+  location /.well-known/acme-challenge/ {
+    root /var/www/certbot;
+  }
+
+  # §14: endpoint reservado do dashboard master — bloqueado externamente
+  location /internal/ {
+    return 404;
+  }
+
+  location / {
+    proxy_pass http://traefik:8000;
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+    proxy_read_timeout 120s;
+  }
+}
