@@ -85,10 +85,6 @@ class Settings(BaseSettings):
     VAPID_PRIVATE_KEY: Optional[str] = None
     VAPID_PUBLIC_KEY: Optional[str] = None
 
-    # ===== API-SPORTS =====
-    APISPORTS_KEY: Optional[str] = None
-    APISPORTS_WC_SEASON: Optional[str] = None
-
     # ===== REDIS =====
     REDIS_HOST: str = "localhost"
     REDIS_PORT: int = 6379
